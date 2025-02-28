@@ -1,0 +1,6 @@
+{
+  "watch": ["src/**/*.js", "cmd/**/*.js", "src/config/**/*.js", "constants"],
+  "ext": "js,json",
+  "ignore": ["node_modules"],
+  "exec": "node cmd/index.js"
+}
