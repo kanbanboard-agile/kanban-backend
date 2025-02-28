@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: kanbanboard-app
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - DB_URI=postgres://ghalyabr:abrar89@db:5432/kanbanDB
+      - DB_USER=ghalyabr
+      - DB_PASSWORD=abrar89
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=kanbanDB
+      - JWT_SECRET=wjidhjwihUIBWUHUDWHUHDuj27
+    volumes:
+      - .:/app
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  db:
+    container_name: kanbanboard-db
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=ghalyabr
+      - POSTGRES_PASSWORD=abrar89
+      - POSTGRES_DB=kanbanDB
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - backend
+    restart: always
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
