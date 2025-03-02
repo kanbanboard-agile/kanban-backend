@@ -8,6 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# buat jaga-jaga
+RUN npm install -g nodemon
+
 COPY . .
 
 COPY entrypoint.sh /entrypoint.sh
