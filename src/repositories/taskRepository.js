@@ -1,0 +1,100 @@
+import Task from "../domain/model/taskModel.js";
+import { 
+  TaskDTO, 
+  TaskResponseDTO 
+} from "../domain/dto/taskDTO.js";
+import { ERROR_MESSAGES } from "../constants/errorConstants.js";
+import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
+import { STATUS_CODES } from "../constants/statuscodeConstants.js";
+
+class TaskRepository {
+  // Helper untuk membungkus error dengan status code
+  #throwError(message, statusCode) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    throw error;
+  }
+
+  // Create Task
+  async createTask(createTaskRequestDTO) {
+    const task = await Task.create({
+      workspaceId: createTaskRequestDTO.workspaceId,
+      title: createTaskRequestDTO.title,
+      description: createTaskRequestDTO.description,
+      status: createTaskRequestDTO.status,
+      progress: createTaskRequestDTO.progress,
+      deadline: createTaskRequestDTO.deadline,
+      isAiGenerated: createTaskRequestDTO.isAiGenerated,
+    });
+    return task;
+  }
+
+  // Get Task by ID
+  async findTaskById(task_id) {
+    const task = await Task.findByPk(task_id);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    console.log("Task from DB:", task);
+    return task;
+  }
+
+  // Get All Tasks by Workspace ID
+  async findTasksByWorkspaceId(workspaceId) {
+    const tasks = await Task.findAll({ where: { workspaceId: workspaceId } });
+
+    return tasks.map((task) => new TaskDTO(task));
+  }
+
+  // Update Task
+  async updateTask(task_id, updateTaskRequestDTO) {
+    const task = await Task.findByPk(task_id);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    await task.update({
+      title: updateTaskRequestDTO.title || task.title,
+      description: updateTaskRequestDTO.description || task.description,
+      status: updateTaskRequestDTO.status || task.status,
+      progress: updateTaskRequestDTO.progress ?? task.progress, // Menggunakan `??` untuk menangani angka 0
+      deadline: updateTaskRequestDTO.deadline || task.deadline,
+      isAiGenerated: 
+        updateTaskRequestDTO.isAiGenerated ?? task.isAiGenerated,
+    });
+
+    console.log("Updated Task from DB:", task); // Log data dari database
+
+    return task;
+  }
+
+  // Delete Task
+  async deleteTask(task_id) {
+    try {
+      const task = await Task.findByPk(task_id);
+
+      if (!task) {
+        this.#throwError(
+          ERROR_MESSAGES.TASK_NOT_FOUND,
+          STATUS_CODES.NOT_FOUND
+        );
+      }
+
+      await task.destroy();
+
+      return {
+        data: null,
+        message: SUCCESS_MESSAGES.TASK_DELETED,
+        statusCode: STATUS_CODES.SUCCESS,
+      };
+    } catch (error) {
+      this.#throwError(
+        ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        STATUS_CODES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+}
+
+export default new TaskRepository();
