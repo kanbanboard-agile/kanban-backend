@@ -27,18 +27,9 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('Upcoming Work', 'To Do', 'Review', 'Done'),
+        type: Sequelize.ENUM('To Do', 'Ongoing', 'Done'),
         allowNull: false,
-        defaultValue: 'Upcoming Work',
-      },
-      progress: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-        validate: {
-          min: 0,
-          max: 100,
-        },
+        defaultValue: 'To Do',
       },
       deadline: {
         type: Sequelize.DATE,

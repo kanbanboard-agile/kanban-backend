@@ -31,18 +31,9 @@ const Task = sequelize.define(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM('Upcoming Work', 'To Do', 'Review', 'Done'),
+      type: DataTypes.ENUM('To Do', 'Ongoing', 'Done'),
       allowNull: false,
-      defaultValue: 'Upcoming Work',
-    },
-    progress: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-      validate: {
-        min: 0,
-        max: 100,
-      },
+      defaultValue: 'To Do',
     },
     deadline: {
       type: DataTypes.DATE,

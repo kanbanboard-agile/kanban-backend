@@ -22,14 +22,14 @@ class TaskController {
   // Buat Task baru
   async createTask(req, res) {
     try {
-      const { workspaceId, title, description, status, progress, deadline, isAiGenerated } = req.body;
+      const { workspaceId, title, description, status, deadline, isAiGenerated } = req.body;
 
       // Validasi input
-      if (!workspaceId || !title || !status || progress === undefined || !deadline) {
-        throw new Error("workspaceId, title, status, progress, dan deadline harus diisi");
+      if (!workspaceId || !title || !status || !deadline) {
+        throw new Error("workspaceId, title, status, dan deadline harus diisi");
       }
 
-      const dto = new CreateTaskRequestDTO(workspaceId, title, description, status, progress, deadline, isAiGenerated);
+      const dto = new CreateTaskRequestDTO(workspaceId, title, description, status, deadline, isAiGenerated);
       const { data, message, statusCode } = await TaskService.createTask(dto);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
@@ -73,13 +73,13 @@ class TaskController {
   async updateTask(req, res) {
     try {
       const { id } = req.params;
-      const { title, description, status, progress, deadline, isAiGenerated } = req.body;
+      const { title, description, status, deadline, isAiGenerated } = req.body;
 
-      if (!id || (!title && !description && !status && progress === undefined && !deadline && isAiGenerated === undefined)) {
+      if (!id || (!title && !description && !status && !deadline && isAiGenerated === undefined)) {
         throw new Error("ID task dan setidaknya satu field harus diisi untuk diperbarui");
       }
 
-      const dto = new UpdateTaskRequestDTO(title, description, status, progress, deadline, isAiGenerated);
+      const dto = new UpdateTaskRequestDTO(title, description, status, deadline, isAiGenerated);
       const { data, message, statusCode } = await TaskService.updateTask(id, dto);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
