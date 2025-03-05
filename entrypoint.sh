@@ -27,7 +27,7 @@ npx sequelize-cli db:seed:all || { echo "Seeder failed"; exit 1; }
 # Cek environment untuk hot reload
 if [ "$NODE_ENV" = "development" ]; then
   echo "Starting server in development mode with hot reload..."
-  exec nodemon /app/cmd/index.js
+  exec nodemon --legacy-watch /app/cmd/index.js
 else
   echo "Starting server in production mode..."
   exec node /app/cmd/index.js
