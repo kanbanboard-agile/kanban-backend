@@ -22,7 +22,6 @@ class TaskRepository {
       title: createTaskRequestDTO.title,
       description: createTaskRequestDTO.description,
       status: createTaskRequestDTO.status,
-      progress: createTaskRequestDTO.progress,
       deadline: createTaskRequestDTO.deadline,
       isAiGenerated: createTaskRequestDTO.isAiGenerated,
     });
@@ -58,7 +57,6 @@ class TaskRepository {
       title: updateTaskRequestDTO.title || task.title,
       description: updateTaskRequestDTO.description || task.description,
       status: updateTaskRequestDTO.status || task.status,
-      progress: updateTaskRequestDTO.progress ?? task.progress, // Menggunakan `??` untuk menangani angka 0
       deadline: updateTaskRequestDTO.deadline || task.deadline,
       isAiGenerated: 
         updateTaskRequestDTO.isAiGenerated ?? task.isAiGenerated,

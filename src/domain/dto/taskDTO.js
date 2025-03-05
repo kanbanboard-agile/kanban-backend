@@ -5,7 +5,6 @@ class TaskDTO {
       this.title = task.title;
       this.description = task.description;
       this.status = task.status;
-      this.progress = task.progress;
       this.deadline = task.deadline;
       this.isAiGenerated = task.isAiGenerated;
       this.createdAt = task.createdAt;
@@ -18,23 +17,21 @@ class TaskDTO {
   }
   
   class CreateTaskRequestDTO {
-    constructor(workspaceId, title, description = null, status = 'Upcoming Work', progress = 0, deadline, isAiGenerated = false) {
+    constructor(workspaceId, title, description = null, status = 'To Do',  deadline, isAiGenerated = false) {
       this.workspaceId = workspaceId;
       this.title = title;
       this.description = description;
       this.status = status;
-      this.progress = progress;
       this.deadline = deadline;
       this.isAiGenerated = isAiGenerated;
     }
   }
   
   class UpdateTaskRequestDTO {
-    constructor(title, description, status, progress, deadline, isAiGenerated) {
+    constructor(title, description, status, deadline, isAiGenerated) {
       this.title = title;
       this.description = description;
       this.status = status;
-      this.progress = progress;
       this.deadline = deadline;
       this.isAiGenerated = isAiGenerated;
     }
