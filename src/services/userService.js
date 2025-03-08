@@ -3,12 +3,10 @@ import {
   LoginRequestDTO,
   LoginResponseDTO,
   RegisterRequestDTO,
-  RegisterResponseDTO,
   UpdateRequestDTO,
   UserResponseDTO,
   ResetPasswordRequestDTO,
   ResetPasswordConfirmDTO,
-  ResetPasswordResponseDTO,
 } from "../domain/dto/userDTO.js";
 import { ERROR_MESSAGES } from "../constants/errorConstants.js";
 import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";

@@ -1,14 +1,14 @@
-import WorkspaceRepository from '../repositories/workspaceRepository.js';
+import WorkspaceRepository from "../repositories/workspaceRepository.js";
 import {
   WorkspaceDTO,
   CreateWorkspaceRequestDTO,
   UpdateWorkspaceRequestDTO,
   WorkspaceResponseDTO,
   DeleteWorkspaceResponseDTO,
-} from '../domain/dto/workspaceDTO.js';
-import { ERROR_MESSAGES } from '../constants/errorConstants.js';
-import { SUCCESS_MESSAGES } from '../constants/messageConstants.js';
-import { STATUS_CODES } from '../constants/statuscodeConstants.js';
+} from "../domain/dto/workspaceDTO.js";
+import { ERROR_MESSAGES } from "../constants/errorConstants.js";
+import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
+import { STATUS_CODES } from "../constants/statuscodeConstants.js";
 
 // Fungsi utilitas untuk validasi DTO
 const validateDTO = (dto, DTOClass) => {
@@ -33,9 +33,35 @@ class WorkspaceService {
   // Buat Workspace baru
   async createWorkspace(createWorkspaceRequestDTO) {
     validateDTO(createWorkspaceRequestDTO, CreateWorkspaceRequestDTO);
-    const workspace = await WorkspaceRepository.createWorkspace(createWorkspaceRequestDTO);
+    const workspace = await WorkspaceRepository.createWorkspace(
+      createWorkspaceRequestDTO
+    );
     const data = new WorkspaceResponseDTO(workspace);
-    return buildResponse(data, SUCCESS_MESSAGES.WORKSPACE_CREATED, STATUS_CODES.CREATED);
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.WORKSPACE_CREATED,
+      STATUS_CODES.CREATED
+    );
+  }
+
+  // Dapatkan Semua Workspaces
+  async getAllWorkspace() {
+    const workspace = await WorkspaceRepository.findAllWorkspace();
+    console.log("Data dari Repository: ", workspace);
+
+    if (!workspace || workspace.length === 0) {
+      throwError(ERROR_MESSAGES.WORKSPACE_NOT_FOUND, STATUS_CODES.NOT_FOUND);
+    }
+
+    // Jika workspace adalah array, mapping ke DTO
+    const data = workspace.map((ws) => new WorkspaceDTO(ws));
+    console.log("Data setelah diubah jadi DTO: ", data);
+
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.WORKSPACE_RETRIEVED,
+      STATUS_CODES.SUCCESS
+    );
   }
 
   // Dapatkan Workspace berdasarkan ID
@@ -45,29 +71,50 @@ class WorkspaceService {
       throwError(ERROR_MESSAGES.WORKSPACE_NOT_FOUND, STATUS_CODES.NOT_FOUND);
     }
     const data = new WorkspaceDTO(workspace);
-    return buildResponse(data, SUCCESS_MESSAGES.WORKSPACE_RETRIEVED, STATUS_CODES.SUCCESS);
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.WORKSPACE_RETRIEVED,
+      STATUS_CODES.SUCCESS
+    );
   }
 
   // Dapatkan semua Workspace milik User tertentu
   async getUserWorkspaces(userId) {
     const workspaces = await WorkspaceRepository.findWorkspacesByUserId(userId);
-    const data = workspaces.map((workspace) => new WorkspaceResponseDTO(workspace));
-    return buildResponse(data, SUCCESS_MESSAGES.USER_WORKSPACES_RETRIEVED, STATUS_CODES.SUCCESS);
+    const data = workspaces.map(
+      (workspace) => new WorkspaceResponseDTO(workspace)
+    );
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.USER_WORKSPACES_RETRIEVED,
+      STATUS_CODES.SUCCESS
+    );
   }
 
   // Perbarui Workspace
   async updateWorkspace(id, updateWorkspaceRequestDTO) {
     validateDTO(updateWorkspaceRequestDTO, UpdateWorkspaceRequestDTO);
-    const workspace = await WorkspaceRepository.updateWorkspace(id, updateWorkspaceRequestDTO);
+    const workspace = await WorkspaceRepository.updateWorkspace(
+      id,
+      updateWorkspaceRequestDTO
+    );
     const data = new WorkspaceResponseDTO(workspace);
-    return buildResponse(data, SUCCESS_MESSAGES.WORKSPACE_UPDATED, STATUS_CODES.SUCCESS);
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.WORKSPACE_UPDATED,
+      STATUS_CODES.SUCCESS
+    );
   }
 
   // Hapus Workspace
   async deleteWorkspace(id) {
     await WorkspaceRepository.deleteWorkspace(id);
-    const data = new DeleteWorkspaceResponseDTO('Workspace berhasil dihapus');
-    return buildResponse(data, SUCCESS_MESSAGES.WORKSPACE_DELETED, STATUS_CODES.SUCCESS);
+    const data = new DeleteWorkspaceResponseDTO("Workspace berhasil dihapus");
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.WORKSPACE_DELETED,
+      STATUS_CODES.SUCCESS
+    );
   }
 }
 

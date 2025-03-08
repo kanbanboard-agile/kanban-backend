@@ -22,16 +22,32 @@ class WorkspaceController {
   // Buat Workspace baru
   async createWorkspace(req, res) {
     try {
-      const { userId, name, logoUrl } = req.body;
+      const { userId, name, logoUrl, attachment } = req.body;
 
       // Validasi input
       if (!userId || !name) {
         throw new Error("userId dan name harus diisi");
       }
 
-      const dto = new CreateWorkspaceRequestDTO(userId, name, logoUrl);
+      const dto = new CreateWorkspaceRequestDTO(
+        userId,
+        name,
+        logoUrl,
+        attachment
+      );
       const { data, message, statusCode } =
         await WorkspaceService.createWorkspace(dto);
+      return buildSuccessResponse(res, { data, message, statusCode });
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  // Dapatkan Semua Workspaces
+  async getAllWorkspace(req, res) {
+    try {
+      const { data, message, statusCode } =
+        await WorkspaceService.getAllWorkspace();
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -76,15 +92,15 @@ class WorkspaceController {
   async updateWorkspace(req, res) {
     try {
       const { id } = req.params;
-      const { name, logoUrl } = req.body;
+      const { name, logoUrl, attachment } = req.body;
 
-      if (!id || (!name && !logoUrl)) {
+      if (!id || (!name && !logoUrlm && !attachment)) {
         throw new Error(
           "ID workspace dan setidaknya satu field (name atau logoUrl) harus diisi"
         );
       }
 
-      const dto = new UpdateWorkspaceRequestDTO(name, logoUrl);
+      const dto = new UpdateWorkspaceRequestDTO(name, logoUrl, attachment);
       const { data, message, statusCode } =
         await WorkspaceService.updateWorkspace(id, dto);
       return buildSuccessResponse(res, { data, message, statusCode });

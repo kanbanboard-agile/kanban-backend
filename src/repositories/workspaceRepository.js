@@ -1,8 +1,5 @@
 import Workspace from "../domain/model/workspaceModel.js";
-import {
-  WorkspaceDTO,
-  WorkspaceResponseDTO,
-} from "../domain/dto/workspaceDTO.js";
+import { WorkspaceDTO } from "../domain/dto/workspaceDTO.js";
 import { ERROR_MESSAGES } from "../constants/errorConstants.js";
 import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
 import { STATUS_CODES } from "../constants/statuscodeConstants.js";
@@ -21,8 +18,16 @@ class WorkspaceRepository {
       userId: createWorkspaceRequestDTO.userId,
       name: createWorkspaceRequestDTO.name,
       logoUrl: createWorkspaceRequestDTO.logoUrl,
+      attachment: createWorkspaceRequestDTO.attachment,
     });
     return workspace;
+  }
+
+  // Get All Workspaces
+  async findAllWorkspace() {
+    const workspaces = await Workspace.findAll();
+    console.log("Hasil dari findAllWorkspace: ", workspaces);
+    return workspaces;
   }
 
   // Get Workspace by ID
@@ -53,6 +58,7 @@ class WorkspaceRepository {
     await workspace.update({
       name: updateWorkspaceRequestDTO.name || workspace.name,
       logoUrl: updateWorkspaceRequestDTO.logoUrl || workspace.logoUrl,
+      attachment: updateWorkspaceRequestDTO.attachment || workspace.attachment,
     });
 
     console.log("Updated Workspace from DB:", workspace); // Log data dari database

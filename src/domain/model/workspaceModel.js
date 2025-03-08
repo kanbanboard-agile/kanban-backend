@@ -1,9 +1,9 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../../config/sequelize.js'; 
-import User from './userModel.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../../config/sequelize.js";
+import User from "./userModel.js";
 
 const Workspace = sequelize.define(
-  'Workspace',
+  "Workspace",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,10 +14,10 @@ const Workspace = sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: false,
       references: {
-        model: User, 
-        key: 'id',
+        model: User,
+        key: "id",
       },
-      onDelete: 'CASCADE', 
+      onDelete: "CASCADE",
     },
     name: {
       type: DataTypes.STRING(100),
@@ -26,11 +26,15 @@ const Workspace = sequelize.define(
         notEmpty: true,
       },
     },
+    attachment: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     logoUrl: {
       type: DataTypes.STRING(255),
-      allowNull: true, 
+      allowNull: true,
       validate: {
-        isUrl: true, 
+        isUrl: true,
       },
     },
     createdAt: {
@@ -49,8 +53,7 @@ const Workspace = sequelize.define(
   }
 );
 
-
-Workspace.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-User.hasMany(Workspace, { foreignKey: 'userId', as: 'workspaces' });
+Workspace.belongsTo(User, { foreignKey: "userId", as: "user" });
+User.hasMany(Workspace, { foreignKey: "userId", as: "workspaces" });
 
 export default Workspace;

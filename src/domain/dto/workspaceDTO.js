@@ -4,6 +4,7 @@ class WorkspaceDTO {
     this.userId = workspace.userId;
     this.name = workspace.name;
     this.logoUrl = workspace.logoUrl;
+    this.attachment = workspace.attachment || null;
     this.createdAt = workspace.createdAt;
     this.updatedAt = workspace.updatedAt;
   }
@@ -14,17 +15,19 @@ class WorkspaceDTO {
 }
 
 class CreateWorkspaceRequestDTO {
-  constructor(userId, name, logoUrl = null) {
+  constructor(userId, name, logoUrl = null, attachment = null) {
     this.userId = userId;
     this.name = name;
     this.logoUrl = logoUrl;
+    this.attachment = attachment;
   }
 }
 
 class UpdateWorkspaceRequestDTO {
-  constructor(name, logoUrl) {
+  constructor(name, logoUrl, attachment) {
     this.name = name;
     this.logoUrl = logoUrl;
+    this.attachment = attachment;
   }
 }
 
