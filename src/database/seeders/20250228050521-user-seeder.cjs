@@ -20,6 +20,7 @@ module.exports = {
       {
         name: "John Doe",
         email: "john.doe@example.com",
+        number: "085732848348",
         password: hashedPassword,
         avatar: "https://cloudstorage.com/avatars/john.jpg",
         provider: "local",
@@ -31,6 +32,7 @@ module.exports = {
       {
         name: "Jane Smith",
         email: "jane.smith@example.com",
+        number: "085732848349",
         password: null,
         avatar: null,
         provider: "google",
@@ -42,6 +44,7 @@ module.exports = {
       {
         name: "Admin User",
         email: "admin@example.com",
+        number: "085732848350",
         password: hashedPassword,
         avatar: "https://cloudstorage.com/avatars/admin.jpg",
         provider: "local",

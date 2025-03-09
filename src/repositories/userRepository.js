@@ -17,12 +17,13 @@ class UserRepository {
   // Create User (Register)
   async createUser(registerRequestDTO) {
     try {
-      const { name, email, password, avatar, provider } = registerRequestDTO;
+      const { name, email, number, password, avatar, provider } = registerRequestDTO;
       const hashedPassword = password ? await bcryptjs.hash(password, 10) : null;
 
       const user = await User.create({
         name,
         email,
+        number,
         password: hashedPassword,
         avatar,
         provider,

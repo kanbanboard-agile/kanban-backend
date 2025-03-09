@@ -4,6 +4,7 @@
       this.id = user.id;
       this.name = user.name;
       this.email = user.email;
+      this.number = user.number;
       this.avatar = user.avatar; // Menggantikan role dengan avatar (untuk URL dari cloud storage)
       this.provider = user.provider; // Menambahkan provider untuk login (misal: 'google', 'local')
       this.createdAt = user.createdAt;
@@ -40,9 +41,10 @@
 
   // RegisterRequestDTO
   class RegisterRequestDTO {
-    constructor(name, email, password, avatar, provider = 'local') {
+    constructor(name, email, number, password, avatar, provider = 'local') {
       this.name = name;
       this.email = email;
+      this.number = number;
       this.password = password;
       this.avatar = avatar; // Avatar opsional saat registrasi
       this.provider = provider; // Default 'local', bisa 'google' untuk login Google
@@ -62,7 +64,7 @@
       this.name = name;
       this.email = email;
       this.avatar = avatar; // Update avatar (URL dari cloud storage)
-    }
+    }_
   }
 
   // ResetPasswordRequestDTO (Baru)
