@@ -19,6 +19,11 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      number: {
+        type: Sequelize.STRING(20), // Sesuai dengan VARCHAR(20)
+        allowNull: false,
+        unique: true,
+      },
       password: {
         type: Sequelize.STRING,
         allowNull: true, // Nullable karena provider eksternal seperti Google tidak memerlukan password

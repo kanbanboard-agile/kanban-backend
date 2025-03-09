@@ -19,7 +19,7 @@ class UserController {
   // Register User
   async register(req, res) {
     try {
-      const dto = new RegisterRequestDTO(req.body.name, req.body.email, req.body.password, req.body.avatar, req.body.provider);
+      const dto = new RegisterRequestDTO(req.body.name, req.body.email, req.body.number,req.body.password, req.body.avatar, req.body.provider);
       const result = await UserService.register(dto);
       return buildSuccessResponse(res, result);
     } catch (error) {
