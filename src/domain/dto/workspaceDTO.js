@@ -3,6 +3,7 @@ class WorkspaceDTO {
     this.id = workspace.id;
     this.userId = workspace.userId;
     this.name = workspace.name;
+    this.priority = workspace.priority;
     this.logoUrl = workspace.logoUrl;
     this.createdAt = workspace.createdAt;
     this.updatedAt = workspace.updatedAt;
@@ -14,16 +15,18 @@ class WorkspaceDTO {
 }
 
 class CreateWorkspaceRequestDTO {
-  constructor(userId, name, logoUrl = null) {
+  constructor(userId, name, priority, logoUrl = null) {
     this.userId = userId;
     this.name = name;
+    this.priority = priority;
     this.logoUrl = logoUrl;
   }
 }
 
 class UpdateWorkspaceRequestDTO {
-  constructor(name, logoUrl) {
+  constructor(name, priority, logoUrl) {
     this.name = name;
+    this.priority = priority;
     this.logoUrl = logoUrl;
   }
 }

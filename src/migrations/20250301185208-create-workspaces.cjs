@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Workspaces', {
+    await queryInterface.createTable("Workspaces", {
       id: {
         type: Sequelize.BIGINT,
         autoIncrement: true,
@@ -13,14 +13,19 @@ module.exports = {
         type: Sequelize.BIGINT,
         allowNull: false,
         references: {
-          model: 'Users', 
-          key: 'id',
+          model: "Users",
+          key: "id",
         },
-        onDelete: 'CASCADE', 
+        onDelete: "CASCADE",
       },
       name: {
         type: Sequelize.STRING(100),
         allowNull: false,
+      },
+      priority: {
+        type: Sequelize.ENUM("On Track", "On Hold", "At Risk", "Complete"),
+        allowNull: false,
+        defaultValue: "On Track",
       },
       logoUrl: {
         type: Sequelize.STRING(255),
@@ -29,17 +34,17 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Workspaces');
+    await queryInterface.dropTable("Workspaces");
   },
 };
