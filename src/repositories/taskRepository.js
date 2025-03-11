@@ -1,11 +1,9 @@
 import Task from "../domain/model/taskModel.js";
-import { 
-  TaskDTO, 
-  TaskResponseDTO 
-} from "../domain/dto/taskDTO.js";
+import { TaskDTO, TaskResponseDTO } from "../domain/dto/taskDTO.js";
 import { ERROR_MESSAGES } from "../constants/errorConstants.js";
 import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
 import { STATUS_CODES } from "../constants/statuscodeConstants.js";
+import { Op } from "sequelize";
 
 class TaskRepository {
   // Helper untuk membungkus error dengan status code
@@ -58,8 +56,7 @@ class TaskRepository {
       description: updateTaskRequestDTO.description || task.description,
       status: updateTaskRequestDTO.status || task.status,
       deadline: updateTaskRequestDTO.deadline || task.deadline,
-      isAiGenerated: 
-        updateTaskRequestDTO.isAiGenerated ?? task.isAiGenerated,
+      isAiGenerated: updateTaskRequestDTO.isAiGenerated ?? task.isAiGenerated,
     });
 
     console.log("Updated Task from DB:", task); // Log data dari database
@@ -73,10 +70,7 @@ class TaskRepository {
       const task = await Task.findByPk(task_id);
 
       if (!task) {
-        this.#throwError(
-          ERROR_MESSAGES.TASK_NOT_FOUND,
-          STATUS_CODES.NOT_FOUND
-        );
+        this.#throwError(ERROR_MESSAGES.TASK_NOT_FOUND, STATUS_CODES.NOT_FOUND);
       }
 
       await task.destroy();
@@ -92,6 +86,23 @@ class TaskRepository {
         STATUS_CODES.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  // Ambil Task dengan deadline di antara rentang waktu tertentu
+  async findTasksByDeadlineRange(startDate, endDate) {
+    const tasks = await Task.findAll({
+      where: {
+        deadline: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+    });
+
+    if (tasks.length === 0) {
+      console.log("Tidak ada task dengan deadline dalam rentang waktu ini.");
+    }
+
+    return tasks.map((task) => new TaskDTO(task));
   }
 }
 
