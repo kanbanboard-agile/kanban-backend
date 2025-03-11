@@ -1,8 +1,5 @@
 import Workspace from "../domain/model/workspaceModel.js";
-import {
-  WorkspaceDTO,
-  WorkspaceResponseDTO,
-} from "../domain/dto/workspaceDTO.js";
+import { WorkspaceDTO } from "../domain/dto/workspaceDTO.js";
 import { ERROR_MESSAGES } from "../constants/errorConstants.js";
 import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
 import { STATUS_CODES } from "../constants/statuscodeConstants.js";
@@ -20,6 +17,7 @@ class WorkspaceRepository {
     const workspace = await Workspace.create({
       userId: createWorkspaceRequestDTO.userId,
       name: createWorkspaceRequestDTO.name,
+      priority: createWorkspaceRequestDTO.priority,
       logoUrl: createWorkspaceRequestDTO.logoUrl,
     });
     return workspace;
@@ -52,6 +50,7 @@ class WorkspaceRepository {
 
     await workspace.update({
       name: updateWorkspaceRequestDTO.name || workspace.name,
+      priority: updateWorkspaceRequestDTO.priority || workspace.priority,
       logoUrl: updateWorkspaceRequestDTO.logoUrl || workspace.logoUrl,
     });
 
