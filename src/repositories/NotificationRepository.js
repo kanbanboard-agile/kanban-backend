@@ -42,7 +42,17 @@ class NotificationRepository {
   async findNotificationsByUserId(userId) {
     const notifications = await Notification.findAll({ where: { userId } });
 
-    return notifications.map((notification) => new NotificationDTO(notification));
+    return notifications.map(
+      (notification) => new NotificationDTO(notification)
+    );
+  }
+
+  // Get Notification by Task ID
+  async findByTaskId(taskId) {
+    const notification = await Notification.findOne({
+      where: { task_id: taskId },
+    });
+    return notification;
   }
 
   // Update Notification (e.g., mark as read)

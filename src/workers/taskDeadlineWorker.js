@@ -1,7 +1,7 @@
 import cron from "node-cron";
-import TaskService from "../services/taskService.js";
 import NotificationService from "../services/notificationServices.js";
-import { getIO } from "./socket.js";
+import taskServices from "../services/taskServices.js";
+import { getIO } from "../sockets/initSocket.js";
 
 // Fungsi untuk memeriksa task yang akan deadline besok
 const checkTaskDeadlines = async () => {
@@ -17,41 +17,67 @@ const checkTaskDeadlines = async () => {
     const tomorrowEnd = new Date(tomorrowStart);
     tomorrowEnd.setHours(23, 59, 59, 999);
 
+    console.log(`📅 Rentang Waktu: ${tomorrowStart} - ${tomorrowEnd}`);
+
     // Ambil task yang deadline-nya besok
-    const { data: upcomingTasks } = await TaskService.getTasksByDeadlineRange(
+    const { data: upcomingTasks } = await taskServices.getTasksByDeadlineRange(
       tomorrowStart,
       tomorrowEnd
     );
 
+    if (upcomingTasks.length === 0) {
+      console.log("ℹ️ Tidak ada task yang deadline besok.");
+      return;
+    }
+
+    console.log(
+      `📊 Ditemukan ${upcomingTasks.length} task yang mendekati deadline.`
+    );
+
     for (const task of upcomingTasks) {
-      // Cek apakah notifikasi untuk task ini sudah pernah dikirim
-      const existingNotification = await NotificationService.findByTaskId(
-        task.id
-      );
-      if (existingNotification) continue;
+      console.log("🔍 Task yang sedang diproses:", task);
 
-      const message = `📆 Reminder: Task "${task.title}" memiliki deadline besok (${task.deadline})`;
+      // Akses id dengan benar dari TaskResponseDTO
+      const taskId = task?.task?.id;
+      const userId = task?.task?.userId;
 
-      // Simpan notifikasi di database
+      if (!taskId) {
+        console.error("❌ task.id tidak valid atau undefined:", task);
+        continue;
+      }
+
+      console.log(`📥 Mencari notifikasi untuk task ID: ${taskId}`);
+
+      const existingNotification =
+        await NotificationService.getNotificationByTaskId(taskId);
+
+      if (existingNotification) {
+        console.log(
+          `🔔 Notifikasi sudah dikirim sebelumnya untuk task ID: ${taskId}`
+        );
+        continue;
+      }
+
+      const message = `📆 Reminder: Task "${task.task.title}" memiliki deadline besok (${task.task.deadline})`;
+
       await NotificationService.createNotification({
-        task_id: task.id,
-        userId: task.userId,
+        task_id: taskId,
+        userId: userId,
         message: message,
         type: "deadline",
         sent_at: new Date(),
         is_read: false,
       });
 
-      // Kirim notifikasi real-time via Socket.IO
       const io = getIO();
-      io.to(`user_${task.userId}`).emit("notification:new", {
-        taskId: task.id,
+      io.to(`user_${userId}`).emit("notification:new", {
+        taskId: taskId,
         message,
         type: "deadline",
       });
 
       console.log(
-        `✅ Notifikasi dikirim ke user ${task.userId} untuk task ${task.id}`
+        `✅ Notifikasi berhasil dikirim ke user ${userId} untuk task ${taskId}`
       );
     }
   } catch (error) {
@@ -59,10 +85,8 @@ const checkTaskDeadlines = async () => {
   }
 };
 
-// Menjadwalkan pengecekan setiap hari jam 00:00
+// Menjadwalkan cron job
 export const startTaskDeadlineChecker = () => {
-  cron.schedule("0 0 * * *", checkTaskDeadlines);
-  console.log(
-    "🕒 Task deadline checker dijalankan setiap hari pada jam 00:00."
-  );
+  cron.schedule("*/5 * * * * *", checkTaskDeadlines); // Jalan setiap 5 detik (untuk testing)
+  console.log("🕒 Task deadline checker berjalan setiap 5 detik (testing).");
 };

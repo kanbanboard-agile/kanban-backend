@@ -57,6 +57,24 @@ class NotificationService {
     );
   }
 
+  // Dapatkan notfikasi berdasarkan Task ID
+  async getNotificationByTaskId(taskId) {
+    const notification = await NotificationRepository.findByTaskId(taskId);
+    if (!notification) {
+      return buildResponse(
+        null,
+        ERROR_MESSAGES.NOTIFICATION_NOT_FOUND,
+        STATUS_CODES.NOT_FOUND
+      );
+    }
+    const data = new NotificationResponseDTO(notification);
+    return buildResponse(
+      data,
+      SUCCESS_MESSAGES.NOTIFICATION_RETRIEVED,
+      STATUS_CODES.SUCCESS
+    );
+  }
+
   // Dapatkan semua notifikasi untuk pengguna tertentu
   async getUserNotifications(userId) {
     const notifications =

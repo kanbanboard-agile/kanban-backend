@@ -4,6 +4,8 @@ import { ERROR_MESSAGES } from "../constants/errorConstants.js";
 import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
 import { STATUS_CODES } from "../constants/statuscodeConstants.js";
 import { Op } from "sequelize";
+import Workspace from "../domain/model/workspaceModel.js";
+import User from "../domain/model/userModel.js";
 
 class TaskRepository {
   // Helper untuk membungkus error dengan status code
@@ -96,13 +98,26 @@ class TaskRepository {
           [Op.between]: [startDate, endDate],
         },
       },
+      include: [
+        {
+          model: Workspace,
+          as: "workspace",
+          include: [
+            {
+              model: User,
+              as: "user", // Ambil relasi user dari workspace
+              attributes: ["id"], // Ambil hanya userId
+            },
+          ],
+        },
+      ],
     });
 
     if (tasks.length === 0) {
       console.log("Tidak ada task dengan deadline dalam rentang waktu ini.");
     }
 
-    return tasks.map((task) => new TaskDTO(task));
+    return tasks;
   }
 }
 
