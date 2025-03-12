@@ -28,7 +28,7 @@ const Task_Attachments = sequelize.define(
       },
     },
     file_type: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(255),
       allowNull: false,
       validate: {
         notEmpty: true,

@@ -1,9 +1,9 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../../config/sequelize.js";
-import User from "./userModel.js";
+import { DataTypes } from 'sequelize';
+import sequelize from '../../config/sequelize.js';
+import User from './userModel.js';
 
 const Workspace = sequelize.define(
-  "Workspace",
+  'Workspace',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,9 +15,9 @@ const Workspace = sequelize.define(
       allowNull: false,
       references: {
         model: User,
-        key: "id",
+        key: 'id',
       },
-      onDelete: "CASCADE",
+      onDelete: 'CASCADE',
     },
     name: {
       type: DataTypes.STRING(100),
@@ -27,15 +27,15 @@ const Workspace = sequelize.define(
       },
     },
     priority: {
-      type: DataTypes.ENUM("On Track", "On Hold", "At Risk", "Complete"),
+      type: DataTypes.ENUM('On Track', 'On Hold', 'At Risk', 'Complete'),
       allowNull: false,
-      defaultValue: "On Track",
+      defaultValue: 'On Track',
     },
     logoUrl: {
       type: DataTypes.STRING(255),
       allowNull: true,
       validate: {
-        isUrl: true,
+        is: /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/i, // Regex buat URL S3
       },
     },
     createdAt: {
@@ -54,7 +54,7 @@ const Workspace = sequelize.define(
   }
 );
 
-Workspace.belongsTo(User, { foreignKey: "userId", as: "user" });
-User.hasMany(Workspace, { foreignKey: "userId", as: "workspaces" });
+Workspace.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Workspace, { foreignKey: 'userId', as: 'workspaces' });
 
 export default Workspace;

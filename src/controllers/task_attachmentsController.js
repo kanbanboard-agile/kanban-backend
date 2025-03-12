@@ -1,7 +1,8 @@
 // TaskAttachmentController.js
-import TaskAttachmentService from "../services/task_attachmentsService.js";
-import { ERROR_MESSAGES } from "../constants/errorConstants.js";
-import { STATUS_CODES } from "../constants/statuscodeConstants.js";
+import TaskAttachmentService from '../services/task_attachmentsService.js';
+import S3Service from '../services/S3Service.js';
+import { ERROR_MESSAGES } from '../constants/errorConstants.js';
+import { STATUS_CODES } from '../constants/statuscodeConstants.js';
 
 // Helper untuk membangun respons sukses
 const buildSuccessResponse = (res, { data, message, statusCode }) => {
@@ -20,30 +21,33 @@ class TaskAttachmentController {
   async addAttachment(req, res) {
     try {
       const { taskId } = req.params;
-      const { file_url, file_type } = req.body; 
-      
-      if (!taskId || !file_url || !file_type) {
-        throw new Error("taskId, fileUrl, dan fileType harus diisi");
-      }
+      const file = req.file; // File dari Multer
 
-      const { data, message, statusCode } = await TaskAttachmentService.createTaskAttachment({ 
-        taskId, 
-        file_url, 
-        file_type
+      if (!taskId || !file) {
+        throw new Error('taskId dan file harus diisi');
+      }
+      const file_type = file.mimetype;
+      const file_url = await S3Service.uploadFile(file, 'task-attachments');
+
+      const { data, message, statusCode } = await TaskAttachmentService.createTaskAttachment({
+        taskId,
+        file_url,
+        file_type,
       });
 
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
+      console.error('Error in addAttachment:', error.message); // Tambah log untuk debug
       return handleErrorResponse(res, error);
     }
-}
+  }
 
   // Dapatkan semua lampiran berdasarkan Task ID
   async getAttachments(req, res) {
     try {
       const { taskId } = req.params;
       if (!taskId) {
-        throw new Error("taskId harus diisi");
+        throw new Error('taskId harus diisi');
       }
 
       const { data, message, statusCode } = await TaskAttachmentService.getTaskAttachmentsByTaskId(taskId);
@@ -58,12 +62,29 @@ class TaskAttachmentController {
     try {
       const { attachmentId } = req.params;
       if (!attachmentId) {
-        throw new Error("attachmentId harus diisi");
+        throw new Error('attachmentId harus diisi');
+      }
+
+      // Ambil attachment dari database sebelum hapus
+      const attachment = await TaskAttachmentService.getTaskAttachmentById(attachmentId);
+      const fileUrl = attachment.data.file_url;
+
+      // Hapus file dari S3 (opsional, tambah logika ini)
+      if (fileUrl && fileUrl.startsWith('https://')) {
+        const key = fileUrl.split('.com/')[1]; // Ekstrak Key dari URL
+        const params = {
+          Bucket: process.env.AWS_S3_BUCKET,
+          Key: key,
+        };
+        const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+        await s3Client.send(new DeleteObjectCommand(params));
+        console.log('File deleted from S3:', key);
       }
 
       const { data, message, statusCode } = await TaskAttachmentService.deleteTaskAttachment(attachmentId);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
+      console.error('Error in deleteAttachment:', error.message);
       return handleErrorResponse(res, error);
     }
   }

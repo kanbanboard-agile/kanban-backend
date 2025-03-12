@@ -1,10 +1,8 @@
-import WorkspaceService from "../services/workspaceService.js";
-import { ERROR_MESSAGES } from "../constants/errorConstants.js";
-import {
-  CreateWorkspaceRequestDTO,
-  UpdateWorkspaceRequestDTO,
-} from "../domain/dto/workspaceDTO.js";
-import { STATUS_CODES } from "../constants/statuscodeConstants.js";
+import WorkspaceService from '../services/workspaceService.js';
+import S3Service from '../services/S3Service.js';
+import { ERROR_MESSAGES } from '../constants/errorConstants.js';
+import { CreateWorkspaceRequestDTO, UpdateWorkspaceRequestDTO } from '../domain/dto/workspaceDTO.js';
+import { STATUS_CODES } from '../constants/statuscodeConstants.js';
 
 // Helper untuk membangun respons sukses
 const buildSuccessResponse = (res, { data, message, statusCode }) => {
@@ -22,18 +20,28 @@ class WorkspaceController {
   // Buat Workspace baru
   async createWorkspace(req, res) {
     try {
-      const { userId, name, logoUrl } = req.body;
+      const userId = req.user.id; // Ambil dari token via authMiddleware
+      const { name, priority } = req.body;
 
       // Validasi input
-      if (!userId || !name) {
-        throw new Error("userId dan name harus diisi");
+      if (!name) {
+        const error = new Error('name harus diisi');
+        error.statusCode = STATUS_CODES.BAD_REQUEST;
+        throw error;
       }
 
-      const dto = new CreateWorkspaceRequestDTO(userId, name, logoUrl);
-      const { data, message, statusCode } =
-        await WorkspaceService.createWorkspace(dto);
+      let logoUrl = req.body.logoUrl; // Dukung logoUrl dari JSON
+      if (req.file) {
+        console.log('Uploading logo to S3:', req.file.originalname);
+        logoUrl = await S3Service.uploadFile(req.file, 'workspaces');
+        console.log('Logo uploaded to S3:', logoUrl);
+      }
+
+      const dto = new CreateWorkspaceRequestDTO(userId, name, priority, logoUrl);
+      const { data, message, statusCode } = await WorkspaceService.createWorkspace(dto);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
+      console.error('Error in createWorkspace:', error.message);
       return handleErrorResponse(res, error);
     }
   }
@@ -44,11 +52,10 @@ class WorkspaceController {
       const { id } = req.params;
 
       if (!id) {
-        throw new Error("ID workspace harus diisi");
+        throw new Error('ID workspace harus diisi');
       }
 
-      const { data, message, statusCode } =
-        await WorkspaceService.getWorkspaceById(id);
+      const { data, message, statusCode } = await WorkspaceService.getWorkspaceById(id);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -61,11 +68,10 @@ class WorkspaceController {
       const { userId } = req.params;
 
       if (!userId) {
-        throw new Error("userId harus diisi");
+        throw new Error('userId harus diisi');
       }
 
-      const { data, message, statusCode } =
-        await WorkspaceService.getUserWorkspaces(userId);
+      const { data, message, statusCode } = await WorkspaceService.getUserWorkspaces(userId);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -76,17 +82,20 @@ class WorkspaceController {
   async updateWorkspace(req, res) {
     try {
       const { id } = req.params;
-      const { name, logoUrl } = req.body;
+      const { name, priority } = req.body;
 
-      if (!id || (!name && !logoUrl)) {
-        throw new Error(
-          "ID workspace dan setidaknya satu field (name atau logoUrl) harus diisi"
-        );
+      if (!id) {
+        throw new Error('ID workspace harus diisi');
       }
 
-      const dto = new UpdateWorkspaceRequestDTO(name, logoUrl);
-      const { data, message, statusCode } =
-        await WorkspaceService.updateWorkspace(id, dto);
+      let logoUrl = null;
+      if (req.file) {
+        // Upload file logo ke S3
+        logoUrl = await S3Service.uploadFile(req.file, 'workspaces');
+      }
+
+      const dto = new UpdateWorkspaceRequestDTO(name, priority, logoUrl);
+      const { data, message, statusCode } = await WorkspaceService.updateWorkspace(id, dto);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -99,11 +108,10 @@ class WorkspaceController {
       const { id } = req.params;
 
       if (!id) {
-        throw new Error("ID workspace harus diisi");
+        throw new Error('ID workspace harus diisi');
       }
 
-      const { data, message, statusCode } =
-        await WorkspaceService.deleteWorkspace(id);
+      const { data, message, statusCode } = await WorkspaceService.deleteWorkspace(id);
       return buildSuccessResponse(res, { data, message, statusCode });
     } catch (error) {
       return handleErrorResponse(res, error);

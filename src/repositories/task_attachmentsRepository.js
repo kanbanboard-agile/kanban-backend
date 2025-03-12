@@ -1,10 +1,8 @@
-import TaskAttachment from "../domain/model/task_attachmentsModel.js";
-import { 
-  TaskAttachmentDTO
-} from "../domain/dto/task_attachmentsDTO.js";
-import { ERROR_MESSAGES } from "../constants/errorConstants.js";
-import { SUCCESS_MESSAGES } from "../constants/messageConstants.js";
-import { STATUS_CODES } from "../constants/statuscodeConstants.js";
+import TaskAttachment from '../domain/model/task_attachmentsModel.js';
+import { TaskAttachmentDTO } from '../domain/dto/task_attachmentsDTO.js';
+import { ERROR_MESSAGES } from '../constants/errorConstants.js';
+import { SUCCESS_MESSAGES } from '../constants/messageConstants.js';
+import { STATUS_CODES } from '../constants/statuscodeConstants.js';
 
 class TaskAttachmentRepository {
   // Helper untuk membungkus error dengan status code
@@ -25,6 +23,7 @@ class TaskAttachmentRepository {
 
       return new TaskAttachmentDTO(attachment);
     } catch (error) {
+      console.error('Database Error:', error); // Tambahkan logging
       this.throwError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, STATUS_CODES.INTERNAL_SERVER_ERROR);
     }
   }

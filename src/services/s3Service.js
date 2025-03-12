@@ -1,35 +1,52 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import s3Client from '../config/awsConfig.js';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
-import dotenv from 'dotenv';
 
-dotenv.config();
+class S3Service {
+  async uploadFile(file, folder) {
+    try {
+      const bucket = process.env.AWS_S3_BUCKET;
+      const region = process.env.AWS_REGION;
+      if (!bucket || !region) {
+        throw new Error('AWS_S3_BUCKET or AWS_REGION is not defined in .env');
+      }
 
-const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
-});
-
-export const uploadFileToS3 = async (file) => {
-    const fileKey = `${uuidv4()}-${file.originalname}`;
-    
-    const params = {
-        Bucket: process.env.AWS_S3_BUCKET,
-        Key: fileKey,
+      // Encode nama file biar URL-safe, tapi tetep readable
+      const encodedFilename = encodeURIComponent(file.originalname.replace(/ /g, '-')); // Ganti spasi jadi -
+      const uniqueFilename = `${uuidv4()}-${encodedFilename}`;
+      console.log('Uploading with Key:', `${folder}/${uniqueFilename}`); // Debug
+      const params = {
+        Bucket: bucket,
+        Key: `${folder}/${uniqueFilename}`,
         Body: file.buffer,
         ContentType: file.mimetype,
-    };
-
-    try {
-        const result = await s3.send(new PutObjectCommand(params));
-        console.log('Upload Success:', result);
-        return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+      };
+      const command = new PutObjectCommand(params);
+      await s3Client.send(command);
+      const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${params.Key}`;
+      console.log('Generated S3 URL:', fileUrl); // Debug
+      return fileUrl;
     } catch (error) {
-        console.error('Upload Error:', error);
-        throw error;
+      throw new Error(`Failed to upload file to S3: ${error.message}`);
     }
-};
+  }
 
-export default { uploadFileToS3 };
+  async deleteFile(fileUrl) {
+    try {
+      const bucket = process.env.AWS_S3_BUCKET;
+      const key = fileUrl.split('.com/')[1];
+      const params = {
+        Bucket: bucket,
+        Key: key,
+      };
+      const command = new DeleteObjectCommand(params);
+      await s3Client.send(command);
+      console.log('File deleted from S3:', key);
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to delete file from S3: ${error.message}`);
+    }
+  }
+}
+
+export default new S3Service();

@@ -23,7 +23,7 @@ module.exports = {
         allowNull: false,
       },
       file_type: {
-        type: Sequelize.STRING(50),
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       uploaded_at: {

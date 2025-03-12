@@ -5,7 +5,7 @@
 
 
 ps:
-	@docker ps
+	@docker logs kanbanboard-app
 
 # Jalankan docker-compose up dengan --build dan recreate jika sudah ada
 jalan:
