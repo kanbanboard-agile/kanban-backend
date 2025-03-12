@@ -1,7 +1,13 @@
-import UserService from '../services/UserService.js';
-import { LoginRequestDTO, RegisterRequestDTO, UpdateRequestDTO, ResetPasswordRequestDTO, ResetPasswordConfirmDTO } from '../domain/dto/userDTO.js';
-import { ERROR_MESSAGES } from '../constants/errorConstants.js';
-import { STATUS_CODES } from '../constants/statuscodeConstants.js';
+import userService from "../services/userService.js";
+import {
+  LoginRequestDTO,
+  RegisterRequestDTO,
+  UpdateRequestDTO,
+  ResetPasswordRequestDTO,
+  ResetPasswordConfirmDTO,
+} from "../domain/dto/userDTO.js";
+import { ERROR_MESSAGES } from "../constants/errorConstants.js";
+import { STATUS_CODES } from "../constants/statuscodeConstants.js";
 
 // Fungsi utilitas untuk response sukses
 const buildSuccessResponse = (res, { data, message, statusCode }) => {
@@ -25,7 +31,7 @@ class UserController {
         req.body.number,
         req.body.password,
         null, // Avatar diisi di UserService
-        req.body.provider || 'local'
+        req.body.provider || "local"
       );
       const result = await UserService.register(dto, req.file);
       return buildSuccessResponse(res, result);
@@ -58,8 +64,8 @@ class UserController {
 
   // Update pengguna
   async updateUser(req, res) {
-    console.log('Request body:', req.body);
-    console.log('Uploaded file:', req.file); // Logging untuk debug
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file); // Logging untuk debug
     try {
       const { id } = req.params;
       const dto = new UpdateRequestDTO(
@@ -99,7 +105,10 @@ class UserController {
   // Konfirmasi reset password
   async confirmResetPassword(req, res) {
     try {
-      const dto = new ResetPasswordConfirmDTO(req.body.token, req.body.password);
+      const dto = new ResetPasswordConfirmDTO(
+        req.body.token,
+        req.body.password
+      );
       const result = await UserService.confirmResetPassword(dto);
       return buildSuccessResponse(res, result);
     } catch (error) {
